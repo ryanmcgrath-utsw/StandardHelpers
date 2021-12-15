@@ -79,7 +79,10 @@ classdef ErrorLogger < handle & matlab.mixin.CustomDisplay
     
     methods (Access = protected)
         function s = getFooter(obj)
-            if numel(obj) == 1 && obj.loggedErrors
+            if numel(obj) ~= 1
+                return % disable footer in empty or array
+            end
+            if obj.loggedErrors
                 s = [' ---------------------------' newline ...
                      ' Most Recent Error: ' newline ...
                      ' ' getReport(obj.errorCodes{end})];
