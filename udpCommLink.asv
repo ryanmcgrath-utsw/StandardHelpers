@@ -133,13 +133,15 @@ classdef udpCommLink < ErrorLogger
             obj.dataFcns{dataType} = fcnHandle;
         end
         
-        function editConnection(obj, prop, value)
+        function editConnection(prop, value)
             %EDITCONNECTION allows for user to change specific properties 
             % of the connection for both sides of the comm link
             switch prop
                 case 'dataSize'
                     obj.send(0,3,value)
-                    obj.sock.OutputDatagramSize = value;
+                    pause(0.2)
+                    alStatus = obj.activeListening;
+                    obj.disconnect()
                     
                 otherwise
                     obj.err(0,'Invalid property given. Check udpCommLink.editConnection for possible property values.')
@@ -197,7 +199,7 @@ classdef udpCommLink < ErrorLogger
                     end
                 case 3
                     % new dataSize value being used
-                    obj.sock.OutputDatagramSize = data(1);
+                    
             end
         end
         
@@ -315,17 +317,6 @@ classdef udpCommLink < ErrorLogger
                 obj.err(force, 'Unable to generate UDP socket', ME)
                 obj.my_status = 0;
             end
-        end
-        
-        function reformSocket(obj)
-            %REFORMSOCKET disconnects and recreates the socket then
-            % connects again using the same active listening protocol
-            % To be done when uneditable part of the socket needs to be
-            % changed like the port number
-            activeListeningStatus = obj.activeListening;
-            obj.disconnect()
-            obj.connect()
-            obj.activeListening = activeListeningStatus;
         end
         
         function waitTime = wait4msg(obj, timeOut)
