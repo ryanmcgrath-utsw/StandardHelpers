@@ -105,6 +105,7 @@ classdef udpCommLink < ErrorLogger
         
         function set.activeListening(obj,value)
             %set.ACTIVELISTENING more for debugging
+            debug(['Set activeListening: ' value])
             switch value
                 case 'on'
                     configureCallback(obj.sock,'datagram',1,@obj.handleMessage)
@@ -205,7 +206,7 @@ classdef udpCommLink < ErrorLogger
             %DATAMESSAGE
             recv = data;
             status = 1;
-            if ~isempty(obj.dataFcns)
+            if ~isempty(obj.dataFcns) && recv(1)<=length(obj.dataFcns)
                 fcnHandle = obj.dataFcns{recv(1)};
                 fcnHandle(recv(2:end), obj)
             end
