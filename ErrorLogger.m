@@ -34,7 +34,7 @@ classdef ErrorLogger < handle & matlab.mixin.CustomDisplay
                 obj.errorMsgs{end+1} = msg;
             end
             
-            errCode = MException(['ErrorLogger:' class(obj)], msg);
+            errCode = MException(strrep(['ErrorLogger:' class(obj)],'.',':'), msg);
             if nargin > 3
                 errCode = addCause(errCode, code);
             end 

@@ -343,5 +343,9 @@ classdef udpCommLink < ErrorLogger
                 waitTime = 0;
             end
         end
+        
+        function delete(obj)
+            obj.disconnect()
+        end
     end
 end

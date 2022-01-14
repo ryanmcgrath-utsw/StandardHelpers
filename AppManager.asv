@@ -1,0 +1,20 @@
+classdef AppManager < ErrorLogger
+    %APPMANAGER handles managing an app project by ensuring required files
+    % exist and preferences are set and resources are generated.
+    
+    properties
+        preferences 
+        projectFolder
+        appName
+    end
+    
+    methods
+        function obj = AppManager(appPath)
+            [obj.projectFolder, obj.appName] = fileparts(appPath);
+            files = struct2cell( dir(obj.projectFolder) );
+            for ff = files
+                disp(ff{1})
+            end
+        end
+    end
+end
