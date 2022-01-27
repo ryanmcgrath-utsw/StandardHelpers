@@ -203,9 +203,10 @@ classdef OptionalVariablesParser < dynamicprops & ErrorLogger
             
             % double check the rule has not already been made
             if isfield(obj.variableRules, name)
-                disp('wait what really')
-            else
-                disp('ok continue')
+                debug('Rule already created!')
+                dbstop if warning
+                warning('Check this out')
+                dbclear if warning
             end
             
             % ask user if they want to create a new rule set
