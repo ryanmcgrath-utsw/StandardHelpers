@@ -19,6 +19,7 @@ for ii = 1:length(X)
     end
 end
 openDividers(openDividers==0) = [];
+openDividers = [0 openDividers];
 
 nextDividerIndex = find(diff(sort(openDividers))>1,1);
 if isempty(nextDividerIndex)
