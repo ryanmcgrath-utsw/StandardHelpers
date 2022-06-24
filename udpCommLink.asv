@@ -33,8 +33,8 @@ classdef udpCommLink < ErrorLogger
         timeOut = 1
         dataFcns = {}
         
-        longDATA_in  containers.Map % map of longDATA transfers this side is recieving
-        longDATA_out containers.Map % map of longDATA transfers this side is sending
+        longDATA_in  containers.Map
+        longDATA_out containers.Map
         
         ping = 'Not Connected'
         deleteWatcher
@@ -234,12 +234,14 @@ classdef udpCommLink < ErrorLogger
             for key = keys(obj.longDATA_in)
                 if iscell(obj.longDATA_in(key{1}))
                     % still need more info from other side
+                    debug(key{1})
                     missing = cellfun(@(x) isempty(x), obj.longDATA_in(key{1}));
-                    obj.requestLongDATA(key{1}, missing)
+                    debug(sum(missing))
+                    obj.requestLongDATA_in(key{1}, missing)
                 else
                     % done with the longDATA transfer
                     obj.send(0,4,[0 typecast(uint32(key{1}), 'uint8')])
-                    remove(obj.longDATA_in, key{1});
+                    obj.longDATA
                 end
             end
         end
@@ -271,9 +273,6 @@ classdef udpCommLink < ErrorLogger
                     % request for longData info or to finish request
                     if data(1)
                         key = typecast(data(2:5), 'uint32');
-                        if ~isKey(obj.longDATA_out, key)
-                            debug('wat')
-                        end
                         DATA = obj.longDATA_out(key);
                         missing = logical(data(6:end));
                         if ~isempty(DATA(missing))
@@ -281,7 +280,7 @@ classdef udpCommLink < ErrorLogger
                         end
                     else
                         key = typecast(data(2:end), 'uint32');
-                        remove(obj.longDATA_out, key);
+                        obj.longDATA_out(key) = [];
                     end
             end
         end
@@ -321,6 +320,7 @@ classdef udpCommLink < ErrorLogger
                 tempCell = obj.longDATA_in(key);
                 tempCell{packetNumber} = data;
                 obj.longDATA_in(key) = tempCell;
+                debug(sum(cellfun(@(x) isempty(x), obj.longDATA_in(key))))
                 if all(cellfun(@(x) ~isempty(x), tempCell))
                     % just finished recieving everything
                     obj.longDATA_in(key) = cell2mat(tempCell');
