@@ -35,6 +35,7 @@ classdef udpCommLink < ErrorLogger
         
         longDATA_in  containers.Map % map of longDATA transfers this side is recieving
         longDATA_out containers.Map % map of longDATA transfers this side is sending
+        longDATA_timer timer        % timer to ensure longDATA gets transfered
         
         deleteWatcher
     end
@@ -71,6 +72,12 @@ classdef udpCommLink < ErrorLogger
             % try to connect to link
             obj.link_status = 0;
             obj.connect()
+            
+            % set up longDATA_timer
+            obj.longDATA_timer.Period = 0.5;
+            obj.longDATA_timer.ExecutionMode = 'FixedSpacing';
+            obj.longDATA_timer.Name = 'UDP_longDATA_timer';
+            obj.longDATA_timer.TimerFcn = @(~,~)obj.checkLongDATA;
         end
         
         function connect(obj)
@@ -230,6 +237,12 @@ classdef udpCommLink < ErrorLogger
                         status{ii} = 0;
                 end
             end
+            obj.checkLongDATA()
+        end
+        
+        function checkLongDATA(obj)
+            %CHECKLONGDATA checks progress on long data transfers and if
+            % additional data packets should be requested
             for key = keys(obj.longDATA_in)
                 if iscell(obj.longDATA_in(key{1}))
                     % still need more info from other side
@@ -240,6 +253,9 @@ classdef udpCommLink < ErrorLogger
                     obj.send(0,4,[0 typecast(uint32(key{1}), 'uint8')])
                     remove(obj.longDATA_in, key{1});
                 end
+            end
+            if isempty(obj.longDATA_in)
+                stop(obj.longDATA_timer)
             end
         end
         
@@ -271,8 +287,9 @@ classdef udpCommLink < ErrorLogger
                     switch data(1)
                         case 0
                             key = typecast(data(2:end), 'uint32');
-                            remove(obj.longDATA_out, key);
-                        
+                            if isKey(obj.longDATA_out, key)
+                                remove(obj.longDATA_out, key);
+                            end                    
                         case 1
                             key = typecast(data(2:5), 'uint32');
                             if ~isKey(obj.longDATA_out, key)
@@ -286,7 +303,9 @@ classdef udpCommLink < ErrorLogger
                         
                         case 2
                             key = typecast(data(2:end), 'uint32');
-                            remove(obj.longDATA_in, key);
+                            if isKey(obj.longDATA_in, key)
+                                remove(obj.longDATA_in, key);
+                            end
                     end
             end
         end
@@ -353,6 +372,9 @@ classdef udpCommLink < ErrorLogger
                 debug('why')
             end
             obj.send(0, 4, [uint8(1) typecast(key, 'uint8') missing])
+            if strcmp(obj.longDATA_timer.running, 'off')
+                start(obj.longDATA_timer)
+            end
         end
         
         function send(obj, type, subType, data)

@@ -50,6 +50,7 @@ classdef FileTransfer < udpCommLink
                 % file found on client prep for transmission
                 obj.file.bytes = typecast(msg(1:8), 'uint64');
                 obj.file.checkSum = typecast(msg(9:16), 'uint64');
+                
             else
                 % file not found let user know
                 obj.err(0, 'Requested file was not found on client''s computer')
@@ -69,14 +70,14 @@ classdef FileTransfer < udpCommLink
             fid = fopen(fullfile(obj.file.folder, obj.file.name), 'w+');
             cleanup = onCleanup(@(~) fclose(fid));
             fwrite(fid, msg);
-            debug('WORKED :)')
+            debug(obj.file)
+            obj.file = struct;
         end
         
         %% send files
         function fileRequested(obj, msg, ~)
             %FILEREQUESTED other side requested a file, prep everything
             
-            obj.transfering = 1;
             paths = split(char(msg),' ~ ');
             if ~exist(paths{1}, 'file')
                 obj.sendData(2, typecast(uint64([0 0]),'uint8'))
