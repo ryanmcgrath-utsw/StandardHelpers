@@ -271,13 +271,13 @@ classdef udpCommLink < ErrorLogger
                     % request for longData info or to finish request
                     switch data(1)
                         case 0
-                            key = typecast(data(2:end), 'uint32');
-                            remove(obj.longDATA_out, key);
+                        key = typecast(data(2:end), 'uint32');
+                        remove(obj.longDATA_out, key);
                         
                         case 1
                             key = typecast(data(2:5), 'uint32');
                             if ~isKey(obj.longDATA_out, key)
-                                obj.send(0, 4, [uint8(2), typecast(key, 'uint8')])
+                                obj.send(0
                             end
                             DATA = obj.longDATA_out(key);
                             missing = logical(data(6:end));
