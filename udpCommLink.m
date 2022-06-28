@@ -278,11 +278,12 @@ classdef udpCommLink < ErrorLogger
                             key = typecast(data(2:5), 'uint32');
                             if ~isKey(obj.longDATA_out, key)
                                 obj.send(0, 4, [uint8(2), typecast(key, 'uint8')])
-                            end
-                            DATA = obj.longDATA_out(key);
-                            missing = logical(data(6:end));
-                            if ~isempty(DATA(missing))
-                                write(obj.sock, cell2mat(DATA(missing)), 'uint8', obj.link_ip, obj.link_port)
+                            else
+                                DATA = obj.longDATA_out(key);
+                                missing = logical(data(6:end));
+                                if ~isempty(DATA(missing))
+                                    write(obj.sock, cell2mat(DATA(missing)), 'uint8', obj.link_ip, obj.link_port)
+                                end
                             end
                         
                         case 2
