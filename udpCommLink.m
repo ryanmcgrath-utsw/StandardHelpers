@@ -268,19 +268,25 @@ classdef udpCommLink < ErrorLogger
                     obj.dataSize = double(typecast(data,'uint64'));
                 case 4
                     % request for longData info or to finish request
-                    if data(1)
-                        key = typecast(data(2:5), 'uint32');
-                        if ~isKey(obj.longDATA_out, key)
-                            debug('wat')
-                        end
-                        DATA = obj.longDATA_out(key);
-                        missing = logical(data(6:end));
-                        if ~isempty(DATA(missing))
-                            write(obj.sock, cell2mat(DATA(missing)), 'uint8', obj.link_ip, obj.link_port)
-                        end
-                    else
-                        key = typecast(data(2:end), 'uint32');
-                        remove(obj.longDATA_out, key);
+                    switch data(1)
+                        case 0
+                            key = typecast(data(2:end), 'uint32');
+                            remove(obj.longDATA_out, key);
+                        
+                        case 1
+                            key = typecast(data(2:5), 'uint32');
+                            if ~isKey(obj.longDATA_out, key)
+                                obj.send(0, 4, [uint8(2), typecast(key, 'uint8')])
+                            end
+                            DATA = obj.longDATA_out(key);
+                            missing = logical(data(6:end));
+                            if ~isempty(DATA(missing))
+                                write(obj.sock, cell2mat(DATA(missing)), 'uint8', obj.link_ip, obj.link_port)
+                            end
+                        
+                        case 2
+                            key = typecast(data(2:end), 'uint32');
+                            remove(obj.longDATA_in, key);
                     end
             end
         end
