@@ -74,6 +74,7 @@ classdef udpCommLink < ErrorLogger
             obj.connect()
             
             % set up longDATA_timer
+            obj.longDATA_timer = timer();
             obj.longDATA_timer.Period = 0.5;
             obj.longDATA_timer.ExecutionMode = 'FixedSpacing';
             obj.longDATA_timer.Name = 'UDP_longDATA_timer';
