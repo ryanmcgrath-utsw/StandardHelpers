@@ -36,7 +36,6 @@ classdef udpCommLink < ErrorLogger
         longDATA_in  containers.Map % map of longDATA transfers this side is recieving
         longDATA_out containers.Map % map of longDATA transfers this side is sending
         
-        ping = 'Not Connected'
         deleteWatcher
     end
     
@@ -364,90 +363,90 @@ classdef udpCommLink < ErrorLogger
         end
         
         %% COMMUNICATION TESTING
-        function split = sendPing(obj)
-            %SENDPING sends a message then waits for response (finds split)
-            write(obj.sock, [0 2 now 1  0], 'double', obj.link_ip, obj.link_port)
-            if obj.wait4msg()
-                recv = read(obj.sock, obj.sock.NumDatagramsAvailable, 'double');
-                recv = recv(end).Data;
-                split = (now - recv(3))*60*24*60;
-                obj.ping = [num2str(split*1000) ' ms'];
-            else
-                % other side failed to respond
-                split = 0;
-                obj.ping = 'Timed Out';
-            end
-        end
-        
-        function splits = pingTest(obj, pingCount, display)
-            %PINGTEST run mulitple pings to gain network statistics
-            if nargin < 3
-                display = 1;
-            end
-            if display
-                feedback = waitbar(0,'Running Communication Test');
-            end
-            splits = zeros(1, pingCount);
-            for ii = 1:pingCount
-                splits(ii) = obj.sendPing();
-                if display
-                    waitbar(ii/pingCount,feedback)
-                end
-            end
-            close(feedback)
-            runTime  = sum(splits);
-            avgSplit = mean(nonzeros(splits))*1000;
-            stdSplit = std(nonzeros(splits))*1000;
-            medSplit = median(nonzeros(splits))*1000;
-            dropped  = sum(splits==0);
-            header  = [' Ping Test Results  ' newline repmat('=',1,25) newline];
-            results = ['          Run Time: ' num2str(runTime)   ' sec' newline ...
-                       '      Average Ping: ' num2str(avgSplit)  ' ms'  newline ...
-                       'Standard Deviation: ' num2str(stdSplit)  ' ms'  newline ...
-                       '       Median Ping: ' num2str(medSplit)  ' ms'  newline ...
-                       '      Packets Sent: ' num2str(pingCount)        newline ...
-                       '   Packets Dropped: ' num2str(dropped)];
-            if display
-            	disp([header results])
-            end
-            obj.ping = [num2str(avgSplit) ' ms'];
-        end
-        
-        function splits = writeTest(obj, writeCount, display)
-            %PINGTEST run mulitple pings to gain network statistics
-            if nargin < 3
-                display = 1;
-            end
-            if display
-                feedback = waitbar(0,'Running Write Test');
-            end
-            splits = zeros(1, writeCount);
-            for ii = 1:writeCount
-                split = tic;
-                obj.send(0, 2, [now 0])
-                splits(ii) = toc(split);
-                if display
-                    waitbar(ii/writeCount,feedback)
-                end
-            end
-            close(feedback)
-            runTime  = sum(splits);
-            avgSplit = mean(nonzeros(splits))*1000;
-            stdSplit = std(nonzeros(splits))*1000;
-            medSplit = median(nonzeros(splits))*1000;
-            dropped  = sum(splits==0);
-            header  = [' Ping Test Results  ' newline repmat('=',1,25) newline];
-            results = ['          Run Time: ' num2str(runTime)   ' sec' newline ...
-                       '      Average Ping: ' num2str(avgSplit)  ' ms'  newline ...
-                       'Standard Deviation: ' num2str(stdSplit)  ' ms'  newline ...
-                       '       Median Ping: ' num2str(medSplit)  ' ms'  newline ...
-                       '      Packets Sent: ' num2str(writeCount)       newline ...
-                       '   Packets Dropped: ' num2str(dropped)];
-            if display
-            	disp([header results])
-            end
-            obj.ping = [num2str(avgSplit) ' ms'];
-        end
+%         function split = sendPing(obj)
+%             %SENDPING sends a message then waits for response (finds split)
+%             write(obj.sock, [0 2 now 1  0], 'double', obj.link_ip, obj.link_port)
+%             if obj.wait4msg()
+%                 recv = read(obj.sock, obj.sock.NumDatagramsAvailable, 'double');
+%                 recv = recv(end).Data;
+%                 split = (now - recv(3))*60*24*60;
+%                 obj.ping = [num2str(split*1000) ' ms'];
+%             else
+%                 % other side failed to respond
+%                 split = 0;
+%                 obj.ping = 'Timed Out';
+%             end
+%         end
+%         
+%         function splits = pingTest(obj, pingCount, display)
+%             %PINGTEST run mulitple pings to gain network statistics
+%             if nargin < 3
+%                 display = 1;
+%             end
+%             if display
+%                 feedback = waitbar(0,'Running Communication Test');
+%             end
+%             splits = zeros(1, pingCount);
+%             for ii = 1:pingCount
+%                 splits(ii) = obj.sendPing();
+%                 if display
+%                     waitbar(ii/pingCount,feedback)
+%                 end
+%             end
+%             close(feedback)
+%             runTime  = sum(splits);
+%             avgSplit = mean(nonzeros(splits))*1000;
+%             stdSplit = std(nonzeros(splits))*1000;
+%             medSplit = median(nonzeros(splits))*1000;
+%             dropped  = sum(splits==0);
+%             header  = [' Ping Test Results  ' newline repmat('=',1,25) newline];
+%             results = ['          Run Time: ' num2str(runTime)   ' sec' newline ...
+%                        '      Average Ping: ' num2str(avgSplit)  ' ms'  newline ...
+%                        'Standard Deviation: ' num2str(stdSplit)  ' ms'  newline ...
+%                        '       Median Ping: ' num2str(medSplit)  ' ms'  newline ...
+%                        '      Packets Sent: ' num2str(pingCount)        newline ...
+%                        '   Packets Dropped: ' num2str(dropped)];
+%             if display
+%             	disp([header results])
+%             end
+%             obj.ping = [num2str(avgSplit) ' ms'];
+%         end
+%         
+%         function splits = writeTest(obj, writeCount, display)
+%             %PINGTEST run mulitple pings to gain network statistics
+%             if nargin < 3
+%                 display = 1;
+%             end
+%             if display
+%                 feedback = waitbar(0,'Running Write Test');
+%             end
+%             splits = zeros(1, writeCount);
+%             for ii = 1:writeCount
+%                 split = tic;
+%                 obj.send(0, 2, [now 0])
+%                 splits(ii) = toc(split);
+%                 if display
+%                     waitbar(ii/writeCount,feedback)
+%                 end
+%             end
+%             close(feedback)
+%             runTime  = sum(splits);
+%             avgSplit = mean(nonzeros(splits))*1000;
+%             stdSplit = std(nonzeros(splits))*1000;
+%             medSplit = median(nonzeros(splits))*1000;
+%             dropped  = sum(splits==0);
+%             header  = [' Ping Test Results  ' newline repmat('=',1,25) newline];
+%             results = ['          Run Time: ' num2str(runTime)   ' sec' newline ...
+%                        '      Average Ping: ' num2str(avgSplit)  ' ms'  newline ...
+%                        'Standard Deviation: ' num2str(stdSplit)  ' ms'  newline ...
+%                        '       Median Ping: ' num2str(medSplit)  ' ms'  newline ...
+%                        '      Packets Sent: ' num2str(writeCount)       newline ...
+%                        '   Packets Dropped: ' num2str(dropped)];
+%             if display
+%             	disp([header results])
+%             end
+%             obj.ping = [num2str(avgSplit) ' ms'];
+%         end
         
         %% MISC FUNCTIONS
         function connectSocket(obj, force)

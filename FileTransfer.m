@@ -3,8 +3,6 @@ classdef FileTransfer < udpCommLink
     % to the other using matlab
     
     properties
-        transfering = 0;
-        transferStats = struct;
         file = struct;
     end
     
