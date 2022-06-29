@@ -82,15 +82,16 @@ classdef FileTransfer < udpCommLink
             
             fileKey = typecast(msg(1:8), 'uint64');
             data = msg(9:end);
-            if obj.file(fileKey).bytes ~= length(data)
+            if obj.file.bytes ~= length(data)
                 obj.err(0, 'File recieved failed count check. File has incorrect number of bytes compared to expected.')
-            elseif obj.file(fileKey).checkSum ~= sum(data)
+            elseif obj.file.checkSum ~= sum(data)
                 obj.err(0, 'File recieved failed sum check. Sum of file recieved doesn''t match expected sum.')
             end
-            fid = fopen(fullfile(obj.file(fileKey).folder, obj.file(fileKey).name), 'w+');
+            fid = fopen(fullfile(obj.file.folder, obj.file.name), 'w+');
             cleanup = onCleanup(@(~) fclose(fid));
             fwrite(fid, data);
-            remove(obj.file, fileKey)
+            debug(obj.file)
+            obj.file(fileKey) = struct;
         end
         
         %% send files
