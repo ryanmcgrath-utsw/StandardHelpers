@@ -104,7 +104,7 @@ classdef FileTransfer < udpCommLink
             if isa(obj.fileCallback,'function_handle')
                 obj.fileCallback(obj.file(fileKey), obj);
             end
-            remove(obj.file, fileKey)
+            remove(obj.file, fileKey);
         end
         
         %% send files

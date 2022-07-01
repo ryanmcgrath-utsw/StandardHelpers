@@ -22,7 +22,7 @@ classdef udpCommLink < ErrorLogger
         activeListening
     end
         
-    properties (Hidden)
+    properties %(Hidden)
         my_ip
         my_port
         link_ip
@@ -358,7 +358,11 @@ classdef udpCommLink < ErrorLogger
                 end
             else
                 % done with long data
-                data = obj.longDATA_in(key);
+                try % not sure wats happening probably timing slash order bug
+                    data = obj.longDATA_in(key);
+                catch
+                    data = [];
+                end
             end
         end
         
