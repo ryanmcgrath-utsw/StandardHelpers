@@ -116,7 +116,7 @@ classdef FileTransfer < udpCommLink
             end
             
             fileKey = typecast(msg(1:8), 'uint64');
-            filePath = char(msg(11:11+msg(9)));
+            filePath = char(msg(11:10+msg(9)));
             if ~exist(filePath, 'file')
                 obj.sendData(22, typecast(uint64([0, 0, fileKey]),'uint8'))
             else
@@ -125,7 +125,7 @@ classdef FileTransfer < udpCommLink
                 data = uint8(fread(fid));
                 obj.sendData(22, typecast(uint64([length(data), sum(data), fileKey]),'uint8'))
                 pause(0.1)
-                obj.sendLargeData(23, [fileKey, data])
+                obj.sendLargeData(23, [typecast(fileKey, 'uint8'), data'])
             end
         end
     end
