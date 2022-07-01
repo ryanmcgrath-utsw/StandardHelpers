@@ -47,13 +47,13 @@ classdef FileTransfer < udpCommLink
             %REQUESTFILE gets the other side to send a file from the path
             % on the client to the path on the host
             
-            fileKey = randi(255,1,10,'uint8');
+            fileKey = randi(255,1,8,'uint8');
             obj.sendData(21, uint8([fileKey, length(clientPath), length(hostPath), clientPath, hostPath]))
             [fileStruct.folder, fileStruct.name, ext] = fileparts(hostPath);
             fileStruct.name = cat(2, fileStruct.name, ext);
             fileStruct.packets = {};
             fileStruct.data = [];
-            obj.file(fileKey) = fileStruct;
+            obj.file(typecast(fileKey,'uint64')) = fileStruct;
         end
         
         function requestReply(obj, msg, ~)
@@ -68,8 +68,10 @@ classdef FileTransfer < udpCommLink
             msg = typecast(msg, 'uint64');
             if msg(1) || msg(2)
                 % file found on client prep for transmission
-                obj.file(msg(3)).bytes = msg(1);
-                obj.file(msg(3)).checkSum = msg(2);
+                fileStruct = obj.file(msg(3));
+                fileStruct.bytes = msg(1);
+                fileStruct.checkSum = msg(2);
+                obj.file(msg(3)) = fileStruct;
                 
             else
                 % file not found let user know
