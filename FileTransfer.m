@@ -4,6 +4,7 @@ classdef FileTransfer < udpCommLink
     
     properties
         file containers.Map % map of all recieving files (sent files are not kept, check superclass udpCommLink)
+        fileCallback (1,1) % handle to function that is called when file is recieved (arguments given is file info and FileTransfer obj)
     end
     
     methods
@@ -16,6 +17,8 @@ classdef FileTransfer < udpCommLink
                 options.clientPort (1,1) double = 5555
                 options.hostIP (1,1) string = udpCommLink.getHostIP()
                 options.hostPort (1,1) double = -1
+                
+                options.fileCallback (1,1) function_handle = @disp
             end
             
             if options.hostPort == -1
@@ -31,6 +34,12 @@ classdef FileTransfer < udpCommLink
             obj.dataSize = 64064;
             obj.initializeUDP(options.clientIP, options.clientPort, options.hostIP, options.hostPort)
             obj.activeListening = 'on';
+            
+            if isequal(options.fileCallback, @disp)
+                obj.fileCallback = @(f,x) disp([class(x) ' recieved ' f.name]);
+            else
+                obj.fileCallback = options.fileCallback;
+            end
         end
         
         %% recieve files
@@ -90,6 +99,9 @@ classdef FileTransfer < udpCommLink
             fid = fopen(fullfile(obj.file(fileKey).folder, obj.file(fileKey).name), 'w+');
             cleanup = onCleanup(@(~) fclose(fid));
             fwrite(fid, data);
+            if isa(obj.fileCallback,'function_handle')
+                obj.fileCallback(obj.file(fileKey), obj);
+            end
             remove(obj.file, fileKey)
         end
         

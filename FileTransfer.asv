@@ -4,6 +4,7 @@ classdef FileTransfer < udpCommLink
     
     properties
         file containers.Map % map of all recieving files (sent files are not kept, check superclass udpCommLink)
+        fileCallback (1,1) function_handle % handle to function that is called when file is recieved (arguments given is file info and FileTransfer obj)
     end
     
     methods
@@ -16,6 +17,8 @@ classdef FileTransfer < udpCommLink
                 options.clientPort (1,1) double = 5555
                 options.hostIP (1,1) string = udpCommLink.getHostIP()
                 options.hostPort (1,1) double = -1
+                
+                options.fileCallback (1,1) function_handle
             end
             
             if options.hostPort == -1
@@ -82,16 +85,15 @@ classdef FileTransfer < udpCommLink
             
             fileKey = typecast(msg(1:8), 'uint64');
             data = msg(9:end);
-            if obj.file.bytes ~= length(data)
+            if obj.file(fileKey).bytes ~= length(data)
                 obj.err(0, 'File recieved failed count check. File has incorrect number of bytes compared to expected.')
-            elseif obj.file.checkSum ~= sum(data)
+            elseif obj.file(fileKey).checkSum ~= sum(data)
                 obj.err(0, 'File recieved failed sum check. Sum of file recieved doesn''t match expected sum.')
             end
-            fid = fopen(fullfile(obj.file.folder, obj.file.name), 'w+');
+            fid = fopen(fullfile(obj.file(fileKey).folder, obj.file(fileKey).name), 'w+');
             cleanup = onCleanup(@(~) fclose(fid));
             fwrite(fid, data);
-            debug(obj.file)
-            obj.file(fileKey) = struct;
+            remove(obj.file, fileKey)
         end
         
         %% send files

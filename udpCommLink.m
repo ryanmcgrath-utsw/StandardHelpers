@@ -35,7 +35,7 @@ classdef udpCommLink < ErrorLogger
         
         longDATA_in  containers.Map % map of longDATA transfers this side is recieving
         longDATA_out containers.Map % map of longDATA transfers this side is sending
-        longDATA_timer timer        % timer to ensure longDATA gets transfered
+        longDATA_timer timer        % timer to ensure longDATA gets transfered  
         
         deleteWatcher
     end
