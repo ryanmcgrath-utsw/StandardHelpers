@@ -315,9 +315,11 @@ classdef udpCommLink < ErrorLogger
         function [data, status] = dataMessage(obj, type, data)
             %DATAMESSAGE
             status = 1;
-            if ~isempty(obj.dataFcns) && type<=length(obj.dataFcns)
-                fcnHandle = obj.dataFcns{type};
+            try
+                fcnHandle = obj.dataFcns{type};  
                 fcnHandle(data, obj)
+            catch 
+                % likely no fcnHandle set, hopefully user intended this
             end
         end
         
