@@ -43,9 +43,16 @@ classdef FileTransfer < udpCommLink
         end
         
         %% recieve files
-        function requestFile(obj, clientPath, hostPath)
+        function requestFile(obj, clientPath, hostPath, userData)
             %REQUESTFILE gets the other side to send a file from the path
             % on the client to the path on the host
+            
+            arguments
+                obj FileTransfer % this object
+                clientPath (1,:) char
+                hostPath (1,:) char
+                userData = [];
+            end
             
             fileKey = randi(255,1,8,'uint8');
             obj.sendData(21, uint8([fileKey, length(clientPath), length(hostPath), clientPath, hostPath]))
@@ -53,6 +60,7 @@ classdef FileTransfer < udpCommLink
             fileStruct.name = cat(2, fileStruct.name, ext);
             fileStruct.packets = {};
             fileStruct.data = [];
+            fileStruct.userData = userData;
             obj.file(typecast(fileKey,'uint64')) = fileStruct;
         end
         
