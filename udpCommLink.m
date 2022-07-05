@@ -16,6 +16,8 @@ classdef udpCommLink < ErrorLogger
         
         UserData % open slot aimed at allowing objects or structures to be 
                  % passed through the activeListening data functions
+                 
+        otherLinks = containers.Map('KeyType','double','ValueType','any') %#ok<MCHDP> % links to all other udpCommLinks TODO check if this can be a constant
     end
     
     properties (Dependent)
@@ -55,6 +57,25 @@ classdef udpCommLink < ErrorLogger
             
             if ~exist('force','var')
                 force = 0;
+            end
+            
+            if isKey(obj.otherLinks, my_port)
+                % another udp object already claims this port
+                answer = questdlg(sprintf('Port (%i) already taken. Do you wish to force delete the udp object? WARNING: this will effect other objects!', my_port), ...
+                    'UDP Port Conflict', 'Delete conflict', 'Enter debug', 'Cancel', 'Cancel');
+                switch answer
+                    case 'Delete conflict'
+                        delete(obj.otherLinks(my_port))
+                        obj.otherLinks(my_port) = obj;
+                    case 'Enter debug'
+                        dbstop if warning mlapp:EnterDebug
+                        warning('mlapp:EnterDebug', 'Entering Debug Mode')
+                        disp('Exiting debug!')
+                    otherwise
+                        obj.err(0, 'Port conflict was unresolved. Forced to terminate udp initialization')
+                end
+            else
+                obj.otherLinks(my_port) = obj;
             end
             
             obj.longDATA_in  = containers.Map('KeyType','uint32', 'ValueType','any');
