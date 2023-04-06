@@ -79,9 +79,9 @@ if ismac %command syntax if under mac
     %the & creates a separate process, so matlab isn't halted until
     %the new window closes
     if isfile
-        system(['open -R ' foo ' &']);
+        system(['open -R "' foo '" &']);
     else
-        system(['open ' foo ' &']);
+        system(['open "' foo '" &']);
     end
     return %this is needed, because mac systems also have isunix=1, so
     %would run the part below as well
