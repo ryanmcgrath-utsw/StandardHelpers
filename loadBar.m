@@ -1,11 +1,20 @@
 classdef loadBar < handle
     %TODO add comments, white space, and clean up
 
-    properties
-        fig     %(1,1) matlab.ui.Figure this does not work as expected
-        progress (1,1) double = 0
-        message  (1,1) string = "Loading ..."
-        UserData % open for misc purposes
+    properties (Access = public)
+        fig              %(1,1) matlab.ui.Figure this does not work as expected
+        progress          (1,1) double = 0
+        message           (1,1) string = "Loading ..."
+        UserData % left open for misc purposes
+    end
+
+    properties (Dependent)
+        estimatedTimeLeft (1,1) double % in seconds
+    end
+
+    properties (Access = private)
+        progressMap       (1,:) cell = {@(x) x * range([0 1]) + 0}
+        ticVal            (1,1) uint64 = tic
     end
 
     methods
@@ -52,12 +61,36 @@ classdef loadBar < handle
             end
         end
 
-        function delete(obj)
+        function close(obj)
             if isvalid(obj.fig)
                 close(obj.fig)
             end
         end
+
+        function delete(obj)
+            close(obj)
+        end
         
+        function increaseDepth(obj, newMax)
+            arguments
+                obj %this
+                newMax (1,1) double = 1
+            end
+            if newMax < obj.progress
+                newMax = obj.progress;
+            elseif newMax > 1
+                newMax = 1;
+            end
+            limits = [obj.progress, obj.progressMap{end}(newMax)];
+            obj.progressMap{end+1} = @(x) x * range(limits) + limits(1);
+        end
+
+        function decreaseDepth(obj)
+            if length(obj.progressMap) > 1
+                obj.progressMap(end) = [];
+            end
+        end
+
         function set.progress(obj, val)
             arguments
                 obj  % this
@@ -68,7 +101,7 @@ classdef loadBar < handle
             elseif val>1
                 val = 1;
             end
-            obj.progress = val;
+            obj.progress = obj.progressMap{end}(val); %#ok<MCSUP> 
             obj.updateFig()
         end
 
@@ -79,6 +112,14 @@ classdef loadBar < handle
             end
             obj.message = val;
             obj.updateFig()
+        end
+    
+        function resetTimeLeft(obj)
+            obj.ticVal = tic;
+        end
+
+        function val = get.estimatedTimeLeft(obj)
+            val = round(toc(obj.ticVal) / obj.progress - toc(obj.ticVal));
         end
     end
 end
