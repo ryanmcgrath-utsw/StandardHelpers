@@ -19,9 +19,9 @@ for ii = 1:length(X)
     end
 end
 openDividers(openDividers==0) = [];
-openDividers = [0 openDividers];
+openDividers = sort([0 openDividers]);
 
-nextDividerIndex = find(diff(sort(openDividers))>1,1);
+nextDividerIndex = find(diff(openDividers)>1,1);
 if isempty(nextDividerIndex)
     nextDividerIndex = max(openDividers) + 1;
 else

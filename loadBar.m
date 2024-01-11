@@ -1,5 +1,6 @@
 classdef loadBar < handle
-    %TODO add comments, white space, and clean up
+    %LOADBAR custom version of waitbar that has greater options and handling
+    % add comments, white space, and clean up
 
     properties (Access = public)
         fig              %(1,1) matlab.ui.Figure this does not work as expected
