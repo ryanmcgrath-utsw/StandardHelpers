@@ -32,6 +32,7 @@ classdef loadBar < handle
             obj.fig = waitbar(progress,message);
             obj.progress = progress;
             obj.message = message;
+            obj.resetTimeLeft()
         end
 
         function update(obj, prog, mess)

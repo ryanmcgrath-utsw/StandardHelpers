@@ -9,6 +9,14 @@ function handles = addScaleBar(ax, xy, txt, sz, hORv)
 %
 % See also TEXT and PLOT
 
+arguments
+    ax   (1,1) matlab.graphics.axis.Axes = gca
+    xy   (1,2) double = [0.1 0.1]
+    txt  (1,:) char = "1 unit"
+    sz   (1,1) double {mustBePositive} = 1
+    hORv (1,1) = 1
+end
+
 % activate the axes to bring to front
 axes(ax)
 if ishold

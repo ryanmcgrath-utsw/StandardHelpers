@@ -3,7 +3,7 @@ function timerHandle = createTimer(timeDuration, message, varargin)
 % after the given time duration
 
 arguments
-    timeDuration (1,1) duration = minute(1)
+    timeDuration (1,1) duration = minute(1) %#ok<TMNUT>
     message (1,1) string = "Your timer has expired!"
 end
 
