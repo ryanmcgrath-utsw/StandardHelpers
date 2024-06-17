@@ -508,6 +508,7 @@ classdef udpCommLink < ErrorLogger
         %% MISC FUNCTIONS
         function connectSocket(obj, force)
         % attempts to connect to the socket
+            if nargin < 2, force = 1; end
             try
                 obj.sock = udpport("datagram", "IPV4", "LocalHost",obj.my_ip, "LocalPort",obj.my_port, "OutputDatagramSize",obj.dataSize+2);
                 obj.deleteWatcher = addlistener(obj,'ObjectBeingDestroyed',@obj.disconnect);
