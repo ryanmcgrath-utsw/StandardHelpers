@@ -19,6 +19,7 @@ classdef FileTransfer < udpCommLink
                 options.hostPort (1,1) double = -1
                 
                 options.fileCallback (1,1) function_handle = @disp
+                options.force = 0;
             end
             
             if options.hostPort == -1
@@ -32,8 +33,12 @@ classdef FileTransfer < udpCommLink
             obj.setDataFcn(23, @obj.fileRecieved)
             
             obj.dataSize = 64064;
-            obj.initializeUDP(options.clientIP, options.clientPort, options.hostIP, options.hostPort)
-            obj.activeListening = 'on';
+            obj.initializeUDP(options.clientIP, options.clientPort, options.hostIP, options.hostPort, "force",options.force)
+            try
+                obj.activeListening = 'on';
+            catch ME
+                warning(ME.message)
+            end
             
             if isequal(options.fileCallback, @disp)
                 obj.fileCallback = @(f,x) disp([class(x) ' recieved ' f.name]);
