@@ -6,7 +6,7 @@ classdef loadBar < handle
         fig              %(1,1) matlab.ui.Figure this does not work as expected
         progress          (1,1) double = 0
         message           (1,1) string = "Loading ..."
-        UserData % left open for misc purposes
+        UserData          % left open for misc purposes
     end
 
     properties (Dependent)
@@ -103,8 +103,11 @@ classdef loadBar < handle
             elseif val>1
                 val = 1;
             end
-            obj.progress = obj.progressMap{end}(val); %#ok<MCSUP> 
-            obj.updateFig()
+            val = obj.progressMap{end}(val); %#ok<MCSUP>
+            if abs(obj.progress - val) >= 0.01 % don't update if not large enough shift
+                obj.progress = val;
+                obj.updateFig()
+            end
         end
 
         function set.message(obj, val)
