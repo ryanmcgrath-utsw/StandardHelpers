@@ -16,13 +16,13 @@ allFigures = allFigures(idx);
 for ii = 1:length(allFigures)
     lb.progress = (ii-1) / length(allFigures);
 
-    slide = add(ppt,"Three Pictures");
+    slide = add(ppt,"Single Picture");
 
     tempName = "tempFigure"+ii+".png";
     tempLoc = fullfile(resourceFolder,"dump",tempName);
     saveas(allFigures(ii), tempLoc)
     figPic = Picture(tempLoc);
-    replace(slide, slide.Children(2).Name, figPic);
+    replace(slide, slide.Children(1).Name, figPic);
 end
 
 lb.progress = 1;
