@@ -3,7 +3,7 @@ classdef loadBar < handle
     % add comments, white space, and clean up
 
     properties (Access = public)
-        fig              %(1,1) matlab.ui.Figure this does not work as expected
+        fig             % (1,1) matlab.ui.Figure this does not work as expected
         progress          (1,1) double = 0
         message           (1,1) string = "Loading ..."
         UserData          % left open for misc purposes
@@ -29,7 +29,12 @@ classdef loadBar < handle
             elseif progress>1
                 progress = 1;
             end
-            obj.fig = waitbar(progress,message);
+            obj.fig = waitbar(progress,message,"Visible","off");
+            if getpref("LoadBar","Toggle",true)
+                obj.fig.Visible = "on";
+            else
+                close(obj.fig)
+            end
             obj.progress = progress;
             obj.message = message;
             obj.resetTimeLeft()
@@ -125,6 +130,23 @@ classdef loadBar < handle
 
         function val = get.estimatedTimeLeft(obj)
             val = round(toc(obj.ticVal) / obj.progress - toc(obj.ticVal));
+        end
+    end
+
+    methods (Static)
+        function prevVal = toggle(val)
+            if nargin < 1
+                val = ~getpref("LoadBar","Toggle",true);
+            end
+            if ~islogical(val)
+                if ~isnumeric(val)
+                    val = strcmpi(val,"on");
+                else
+                    val = logical(val);
+                end
+            end
+            prevVal = getpref("LoadBar","Toggle",true);
+            setpref("LoadBar","Toggle",val)
         end
     end
 end

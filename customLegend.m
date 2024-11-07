@@ -1,15 +1,19 @@
-function lgd = customLegend(Colors, Labels, options)
+function lgd = customLegend(Colors, Labels, options, legendProps)
 %CUSTOMLEGEND(Colors, Labels) input cells of the color of the lines and 
 % then the label for that color
 
 arguments
-    Colors (1,:) cell
-    Labels (1,:) cell
+    Colors
+    Labels
 
-    options.LineWidth (1,1) double = 5
-    options.Location  (1,1) string = "best"
-    options.Tag       (1,1) string = "CustomLegend"
+    options.PlotLineWidth (1,1) double = 5
+    options.PlotTag       (1,1) string = "CustomLegend"
+
+    legendProps.?matlab.graphics.illustration.Legend
 end
+
+Colors = validateColors(Colors);
+Labels = validateLabels(Labels);
 
 if length(Colors) ~= length(Labels)
     err.ID  = "CustomLegend:IncorrectLabelLength";
@@ -20,15 +24,48 @@ end
 numColors = length(Colors);
 for ii = 1:numColors
     try
-        h(ii) = plot(seconds(0),NaN,'Color',Colors{ii}, 'LineWidth',options.LineWidth, 'Tag',options.Tag);  
+        h(ii) = plot(seconds(0),NaN,'Color',Colors{ii}, 'LineWidth',options.PlotLineWidth, 'Tag',options.PlotTag);  
     catch
         try
-            h(ii) = plot(NaN,NaN,'Color',Colors{ii}, 'LineWidth',options.LineWidth, 'Tag',options.Tag); %#ok<*AGROW> 
+            h(ii) = plot(NaN,NaN,'Color',Colors{ii}, 'LineWidth',options.PlotLineWidth, 'Tag',options.PlotTag); %#ok<*AGROW> 
         catch
-            h(ii) = polarplot(NaN,NaN,'Color',Colors{ii}, 'LineWidth',options.LineWidth, 'Tag',options.Tag);
+            h(ii) = polarplot(NaN,NaN,'Color',Colors{ii}, 'LineWidth',options.PlotLineWidth, 'Tag',options.PlotTag);
         end
     end
 end
 lgd = legend(h, Labels);
-lgd.Location = options.Location;
+lgd.Location = "Best";
+if ~isempty(fields(legendProps))
+    % legend options were given
+    opts = namedargs2cell(legendProps);
+    set(lgd, opts{:})
+end
+end
+
+function Colors = validateColors(Colors)
+if iscell(Colors)
+    Colors = Colors(:);
+elseif isnumeric(Colors)
+    temp = cell(size(Colors,1),1);
+    for ii = 1:length(temp)
+        temp{ii} = Colors(ii,:);
+    end
+    Colors = temp;
+else
+    throw(MException("CustomLegend:invalidColors","Invalid 1st input (Colors). Input must be a cell array or matrix with each row being a seperate RGB triplet."))
+end
+end
+
+function Labels = validateLabels(Labels)
+if iscell(Labels)
+    Labels = Labels(:);
+elseif isstring(Labels)
+    temp = cell(size(Labels));
+    for ii = 1:length(temp)
+        temp{ii} = Labels(ii);
+    end
+    Labels = temp;
+else
+    throw(MException("CustomLegend:invalidLabels","Invalid 2nd input (Labels). Input must be a cell or string array containing labels associated with each color."))
+end
 end

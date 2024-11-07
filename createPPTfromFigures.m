@@ -1,12 +1,14 @@
 import mlreportgen.ppt.*
 
-UserTitle = input("Give title for pptx: ", "s");
+[name,path] = uiputfile("*.pptx","Save Figures");
+if ~path, return, end
+saveloc = fullfile(path,name);
 
 lb = StandardHelpers.loadBar(0,"Working...");
 
 resourceFolder = "/Users/ryan/Documents/MATLAB/+StandardHelpers/Resources";
 templateLocation = fullfile(resourceFolder,"ReportTemplate.pptx");
-ppt = Presentation(UserTitle+".pptx",templateLocation);
+ppt = Presentation(saveloc,templateLocation);
 open(ppt);
 
 allFigures = findobj("Type","Figure");
