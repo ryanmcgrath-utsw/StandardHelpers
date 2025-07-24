@@ -1,12 +1,13 @@
-function createPPTfromFigures(saveloc)
+function createPPTfromFigures(saveloc, allFigures)
 
 arguments
     saveloc (1,1) string = "N/A"
+    allFigures (1,:) matlab.ui.Figure = matlab.ui.Figure.empty(0,1);
 end
 
 import mlreportgen.ppt.*
 
-if strcmp(saveloc, "N/A")
+if strcmp(saveloc, "N/A") || strcmp(saveloc, "")
     [name,path] = uiputfile("*.pptx","Save Figures");
     if ~path, return, end
     saveloc = fullfile(path,name);
@@ -24,9 +25,11 @@ ppt = Presentation(saveloc,templateLocation);
 if ~exist(fileparts(saveloc),"dir"), mkdir(fileparts(saveloc)), end
 open(ppt);
 
-allFigures = findobj("Type","Figure");
-[~,idx] = sort([allFigures.Number]);
-allFigures = allFigures(idx);
+if isempty(allFigures)
+    allFigures = findobj("Type","Figure");
+    [~,idx] = sort([allFigures.Number]);
+    allFigures = allFigures(idx);
+end
 
 for ii = 1:length(allFigures)
     lb.progress = (ii-1) / length(allFigures);

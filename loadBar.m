@@ -16,6 +16,11 @@ classdef loadBar < handle
     properties (Access = private)
         progressMap       (1,:) cell = {@(x) x * range([0 1]) + 0}
         ticVal            (1,1) uint64 = tic
+
+        parallelIter      (1,1) double = 0
+        parallelTotalRuns (1,1) double = 1
+        parallelQueue     (1,1) parallel.pool.DataQueue = parallel.pool.DataQueue
+        parallelMessage   (1,1) string = "Parallel Est Left: {timeRemaining} seconds"
     end
 
     methods
@@ -130,6 +135,32 @@ classdef loadBar < handle
 
         function val = get.estimatedTimeLeft(obj)
             val = round(toc(obj.ticVal) / obj.progress - toc(obj.ticVal));
+        end
+    end
+
+    methods % Parallel Processing Feedback
+        function initializeParallelFeedback(obj, totalRuns)
+            arguments
+                obj % this loadBar
+                totalRuns (1,1) double {mustBePositive, mustBeInteger}
+            end
+
+            obj.parallelIter = 0;
+            obj.parallelTotalRuns = totalRuns;
+            afterEach(obj.parallelQueue, @(~) obj.parallelAfterEach());
+        end
+
+        function updateParallel(obj, iter, message)
+            if nargin > 2
+                obj.parallelMessage = message;
+            end
+            send(obj.parallelQueue, iter)
+        end
+
+        function parallelAfterEach(obj) % should be private
+            obj.parallelIter = obj.parallelIter + 1;
+            obj.progress = obj.parallelIter/ obj.parallelTotalRuns;
+            obj.message = strrep(obj.parallelMessage, "{timeRemaining}", string(obj.estimatedTimeLeft));
         end
     end
 
