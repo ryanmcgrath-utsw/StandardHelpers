@@ -19,8 +19,11 @@ end
 
 lb = StandardHelpers.loadBar(0,"Working...");
 
-resourceFolder = "/Users/ryan/Documents/MATLAB/+StandardHelpers/Resources";
+projectFolder = fileparts(mfilename("fullpath"));
+resourceFolder = fullfile(projectFolder,"Resources");
 templateLocation = fullfile(resourceFolder,"ReportTemplate.pptx");
+if ~exist(fullfile(resourceFolder,"dump"), "dir"), mkdir(fullfile(resourceFolder,"dump")), end
+
 ppt = Presentation(saveloc,templateLocation);
 if ~exist(fileparts(saveloc),"dir"), mkdir(fileparts(saveloc)), end
 open(ppt);
