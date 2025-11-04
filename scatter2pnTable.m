@@ -9,6 +9,9 @@ arguments
     lacksDisplayNames (1,1) logical = false
 end
 
+w = warning("off","MATLAB:table:RowsAddedExistingVars");
+c = onCleanup(@(~) warning(w));
+
 plottedData = findobj(ax,"Type","Scatter");
 cats = get(plottedData,'DisplayName');
 if lacksDisplayNames

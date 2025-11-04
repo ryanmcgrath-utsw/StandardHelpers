@@ -1,15 +1,20 @@
 function debug(msg, method)
 % does the same as disp just adds additional info
-if nargin < 2
-    method = 'basic';
+arguments
+    msg
+    method (1,1) string = "basic"
 end
-if isstring(msg) && length(msg) == 1
+
+if isstring(msg) && isscalar(msg)
     msg = char(msg);
 end
+
 if ~ischar(msg)
     msg = evalc('disp(msg)');
 end
+
 msg = strip(msg);
+
 switch method
     case 'basic'
         stack = dbstack;

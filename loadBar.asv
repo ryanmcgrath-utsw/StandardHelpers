@@ -187,7 +187,7 @@ classdef loadBar < handle
                     val = logical(val);
                 end
             end
-            prevVal = getpref("LoadBar","Toggle",true);
+            prevVal = Sgetpref("LoadBar","Toggle",true);
             setpref("LoadBar","Toggle",val)
         end
     end
