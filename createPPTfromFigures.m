@@ -23,13 +23,8 @@ end
 
 lb = StandardHelpers.loadBar(0,"Working...");
 
-<<<<<<< Updated upstream
-projectFolder = fileparts(mfilename("fullpath"));
-resourceFolder = fullfile(projectFolder,"Resources");
-=======
 %% Create Powerpoint file
-resourceFolder = "/Users/ryan/Documents/MATLAB/+StandardHelpers/Resources";
->>>>>>> Stashed changes
+resourceFolder = "/Users/ryan/Documents/MATLAB/+StandardHelpers/Resources"; % FIXME needs use mfilename('fullpath') trick
 templateLocation = fullfile(resourceFolder,"ReportTemplate.pptx");
 if ~exist(fullfile(resourceFolder,"dump"), "dir"), mkdir(fullfile(resourceFolder,"dump")), end
 
